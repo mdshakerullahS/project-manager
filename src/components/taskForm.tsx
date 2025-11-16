@@ -1,3 +1,7 @@
-export default function TaskForm({ id }: { id: string }) {
+type TaskFormProps = {
+  id?: string;
+};
+
+export default function TaskForm({ id }: TaskFormProps) {
   return <div></div>;
 }
