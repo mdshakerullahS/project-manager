@@ -1,6 +1,6 @@
 "use client";
 
-import { ProjectType, useData } from "@/src/app/context/ProjectContext";
+import { ProjectType, useProjects } from "@/src/app/context/ProjectContext";
 import { Button } from "@/src/components/ui/button";
 import {
   Card,
@@ -35,7 +35,7 @@ type PageProps = {
 export default function Page({ params }: PageProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [project, setProject] = useState<ProjectType | null>(null);
-  const { projects } = useData();
+  const { projects } = useProjects();
 
   const { slug } = use(params);
 
