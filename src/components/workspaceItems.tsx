@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+// import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -10,24 +11,27 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { UserType } from "../stores/employeeStore";
-// import { toast } from "sonner";
 
-export default function EmployeeItems() {
-  const [employees, setEmployees] = useState<UserType[] | []>([]);
+type WorkspaceType = {
+  _id: string;
+  account: string;
+  employees: string[];
+};
+export default function WorkspaceItems() {
+  const [Workspaces, setWorkspaces] = useState<WorkspaceType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const getEmployees = async () => {
+  const getWorkspaces = async () => {
     try {
       setLoading(true);
 
-      const res = await fetch("/api/employees");
+      const res = await fetch("/api/workspaces");
 
-      if (!res.ok) throw new Error("Error fetching employees");
+      if (!res.ok) throw new Error("Error fetching workspaces");
 
       const data = await res.json();
 
-      setEmployees(data.employees || []);
+      setWorkspaces(data.workspaces || []);
     } catch (error: any) {
       console.log(error.message);
     } finally {
@@ -36,7 +40,7 @@ export default function EmployeeItems() {
   };
 
   useEffect(() => {
-    getEmployees();
+    getWorkspaces();
   }, []);
 
   if (loading) {
@@ -45,10 +49,8 @@ export default function EmployeeItems() {
 
   return (
     <>
-      {!employees.length && (
-        <p className="text-center py-42">
-          No employee yet - Click "Add Employee" to make request.
-        </p>
+      {!Workspaces.length && (
+        <p className="text-center py-42">No Workspaces yet.</p>
       )}
 
       <Table>
@@ -62,10 +64,10 @@ export default function EmployeeItems() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {employees.map((employee) => (
+          {Workspaces.map((ws) => (
             <TableRow>
-              <TableCell className="font-medium">{employee.name}</TableCell>
-              <TableCell>{employee.name}</TableCell>
+              <TableCell className="font-medium">{ws.account}</TableCell>
+              <TableCell>{ws.employees}</TableCell>
               <TableCell>2</TableCell>
               <TableCell className="text-right">fff</TableCell>
             </TableRow>

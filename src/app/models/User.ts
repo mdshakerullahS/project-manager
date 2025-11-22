@@ -1,11 +1,18 @@
-import { Schema, models, model, Model, InferSchemaType } from "mongoose";
+import { Schema, models, model, Model } from "mongoose";
+
+export interface IUser extends Document {
+  accountType: "Individual" | "Workspace" | null;
+  name: string;
+  email: string;
+  image: string;
+  provider: string;
+}
 
 const userSchema = new Schema(
   {
     accountType: {
       type: String,
       enum: ["Individual", "Workspace", null],
-      default: "",
     },
     name: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -14,8 +21,6 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
-
-export type IUser = InferSchemaType<typeof userSchema>;
 
 const User: Model<IUser> = models.User || model<IUser>("User", userSchema);
 

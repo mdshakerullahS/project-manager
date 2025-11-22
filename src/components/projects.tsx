@@ -1,24 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import Filters from "./filters";
+import { useEffect, useState } from "react";
 import ProjectItems from "./projectItems";
-import { useProjects } from "../app/context/ProjectContext";
+
+import { TaskType } from "./taskItems";
+import ProjectTaskFilter from "./projectTaskFilters";
+export type ProjectType = {
+  _id: string;
+  userID: string;
+  title: string;
+  description: string;
+  tasks: TaskType[];
+  deadline: string;
+  status: "To Do" | "In Progress" | "Completed";
+};
 
 export default function Projects() {
-  const { projects } = useProjects();
+  const [projects, setProjects] = useState<ProjectType[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const getProjects = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/projects");
+
+      if (!res.ok) {
+        throw new Error("Projects couldn't be fetched");
+      }
+      const data = await res.json();
+
+      setProjects(data.projects || []);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getProjects();
+  }, []);
 
   const [filterValue, setFilterValue] = useState<string>("All");
 
   const filteredProjects = projects.filter((project) => {
-    if (filterValue === "All") return true;
-    return project.status === filterValue;
+    return filterValue === "All" || project.status === filterValue;
   });
 
   return (
     <div className="flex flex-col gap-2">
-      <Filters filterValue={filterValue} setFilterValue={setFilterValue} />
-      <ProjectItems filteredProjects={filteredProjects} />
+      <ProjectTaskFilter
+        filterValue={filterValue}
+        setFilterValue={setFilterValue}
+      />
+      <ProjectItems
+        filteredProjects={filteredProjects}
+        setLoading={setLoading}
+        loading={loading}
+      />
     </div>
   );
 }

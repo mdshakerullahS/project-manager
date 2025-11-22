@@ -1,9 +1,17 @@
+"use client";
+
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
 import Select from "react-select";
+import useEmployees from "../stores/employeeStore";
+import { useEffect } from "react";
+
+type TeamFormProps = {
+  id?: string;
+};
 
 interface IFormInput {
   name: string;
@@ -11,13 +19,13 @@ interface IFormInput {
   members: string[];
 }
 
-const employees = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-];
+export default function TeamForm({ id }: TeamFormProps) {
+  const { employees, getEmployees } = useEmployees();
 
-export default function TeamForm() {
+  useEffect(() => {
+    getEmployees();
+  }, []);
+
   const { register, watch, handleSubmit, control, reset } = useForm<IFormInput>(
     {
       defaultValues: {
@@ -65,7 +73,7 @@ export default function TeamForm() {
       </div>
 
       <div className="w-full flex flex-col gap-3">
-        <Label className="px-1">Select Operator to</Label>
+        <Label className="px-1">Select Operator</Label>
         <Controller
           name="operator"
           control={control}
@@ -73,10 +81,10 @@ export default function TeamForm() {
             <Select
               options={employees}
               value={
-                employees.find((employee) => employee.value === value) || null
+                employees.find((employee) => employee.name === value) || null
               }
               onChange={(selectedOption) =>
-                onChange(selectedOption ? selectedOption.value : "")
+                onChange(selectedOption ? selectedOption.name : "")
               }
               placeholder="Select Operator..."
               isClearable
@@ -95,10 +103,10 @@ export default function TeamForm() {
               isMulti
               options={employees}
               value={employees.filter((employee) =>
-                (value || []).includes(employee.value)
+                (value || []).includes(employee.name)
               )}
               onChange={(members) => {
-                onChange(members ? members.map((option) => option.value) : []);
+                onChange(members ? members.map((option) => option.name) : []);
               }}
               placeholder="Select Members..."
             />

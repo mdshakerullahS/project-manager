@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Briefcase,
   CheckSquare,
   FolderKanban,
   LayoutDashboard,
@@ -37,21 +38,28 @@ type SidebarItemType = {
   icon: LucideIcon;
 };
 
-const sidebarItems: SidebarItemType[] = [
+const workspaceItems: SidebarItemType[] = [
+  { label: "Dashboard", icon: LayoutDashboard },
+  { label: "Projects", icon: FolderKanban },
+  { label: "Teams", icon: Users },
+  { label: "Employees", icon: User },
+];
+
+const individualItems: SidebarItemType[] = [
   { label: "Dashboard", icon: LayoutDashboard },
   { label: "Projects", icon: FolderKanban },
   { label: "My Tasks", icon: CheckSquare },
-  { label: "Teams", icon: Users },
-  { label: "Employees", icon: User },
-  { label: "Settings", icon: Settings },
+  { label: "Workspaces", icon: Briefcase },
 ];
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
 
-  if (status === "loading") return null;
-  if (!session) return null;
+  const accountType = session?.user.accountType;
+
+  const sidebarItems =
+    accountType === "Workspace" ? workspaceItems : individualItems;
 
   return (
     <Sidebar>
@@ -59,7 +67,7 @@ export default function AppSidebar() {
         <SidebarGroup className="h-full justify-between">
           <div className="space-y-6">
             <SidebarGroupLabel className="text-xl font-bold">
-              TaskFlow
+              Project Manager
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -90,24 +98,28 @@ export default function AppSidebar() {
 
           <SidebarFooter>
             <DropdownMenu modal={false}>
-              <DropdownMenuTrigger className="w-full flex items-center justify-between gap-8 p-2 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 rounded-lg cursor-pointer">
-                <p>{session.user.name?.split(" ").slice(0, 2).join(" ")}</p>
-                {session?.user.image ? (
-                  <div className="w-8 h-8 rounded-full overflow-hidden relative">
-                    <Image
-                      src={`${session.user.image}`}
-                      fill
-                      sizes="32px"
-                      alt="Profile"
-                      className="object-cover"
-                    />
-                  </div>
-                ) : (
-                  <span className="text-xl font-semibold w-8 h-8 rounded-full">
-                    {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
-                  </span>
-                )}
-              </DropdownMenuTrigger>
+              {status === "loading" ? (
+                <div className="h-4 w-full bg-card" />
+              ) : (
+                <DropdownMenuTrigger className="w-full flex items-center justify-between gap-8 p-2 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 rounded-lg cursor-pointer">
+                  <p>{session?.user.name?.split(" ").slice(0, 2).join(" ")}</p>
+                  {session?.user.image ? (
+                    <div className="w-8 h-8 rounded-full overflow-hidden relative">
+                      <Image
+                        src={`${session.user.image}`}
+                        fill
+                        sizes="32px"
+                        alt="Profile"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-xl font-semibold w-8 h-8 rounded-full">
+                      {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
+                    </span>
+                  )}
+                </DropdownMenuTrigger>
+              )}
               <DropdownMenuContent className="w-40" align="end">
                 <DropdownMenuGroup>
                   <DropdownMenuItem onSelect={() => signOut()}>

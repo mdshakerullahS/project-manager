@@ -1,7 +1,7 @@
 import { checkAuth } from "@/src/lib/checkAuth";
 import dbConnect from "@/src/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import Team from "../../models/Team";
+import Team, { ITeam } from "../../models/Team";
 
 export async function GET() {
   try {
@@ -10,7 +10,13 @@ export async function GET() {
     const { ok, message, resStatus, loggedInUser } = await checkAuth();
     if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    const teams = Team.find({ creator: loggedInUser });
+    let teams: ITeam[] | [] = [];
+    if (loggedInUser?.accountType === "Workspace") {
+      teams = await Team.find({ creator: loggedInUser });
+    }
+    if (loggedInUser?.accountType === "Individual") {
+      teams = await Team.find({ members: loggedInUser._id });
+    }
 
     if (!teams)
       return NextResponse.json({ message: "Teams not found" }, { status: 404 });
@@ -30,11 +36,10 @@ export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
-    const { ok, message, resStatus, loggedInUser, accountType } =
-      await checkAuth();
+    const { ok, message, resStatus, loggedInUser } = await checkAuth();
     if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    if (accountType !== "Workspace")
+    if (loggedInUser?.accountType !== "Workspace")
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const { name, operator, members } = await req.json();
@@ -47,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     const team = await Team.create({
       name,
-      creator: loggedInUser,
+      creator: loggedInUser._id,
       operator,
       members,
     });

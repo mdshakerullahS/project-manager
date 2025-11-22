@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import Select from "react-select";
 import { DatePicker } from "./datePicker";
-import { ProjectType } from "../app/context/ProjectContext";
 import {
   useForm,
   SubmitHandler,
@@ -15,6 +14,8 @@ import {
   Controller,
 } from "react-hook-form";
 import { useEffect, useState } from "react";
+import { ProjectType } from "./projects";
+import useEmployees from "../stores/employeeStore";
 
 type ProjectFormProps = {
   id?: string;
@@ -29,13 +30,13 @@ interface IFormInput {
   status: "To Do" | "In Progress" | "Completed";
 }
 
-const employees = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-];
-
 export default function ProjectForm({ id }: ProjectFormProps) {
+  const { employees, getEmployees } = useEmployees();
+
+  useEffect(() => {
+    getEmployees();
+  }, []);
+
   const [project, setProject] = useState<ProjectType | null>(null);
   useEffect(() => {
     if (id) {
@@ -177,10 +178,10 @@ export default function ProjectForm({ id }: ProjectFormProps) {
               <Select
                 options={employees}
                 value={
-                  employees.find((employee) => employee.value === value) || null
+                  employees.find((employee) => employee.name === value) || null
                 }
                 onChange={(selectedOption) =>
-                  onChange(selectedOption ? selectedOption.value : "")
+                  onChange(selectedOption ? selectedOption.name : "")
                 }
                 placeholder="Select Team..."
                 isClearable

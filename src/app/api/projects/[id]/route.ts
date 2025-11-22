@@ -1,4 +1,4 @@
-import Project from "@/src/app/models/Project";
+import Project, { IProject } from "@/src/app/models/Project";
 import dbConnect from "@/src/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import Task from "@/src/app/models/Task";
@@ -23,9 +23,8 @@ export async function GET(
         { status: 404 }
       );
 
-    if (!project.creator || project.creator.toString() !== loggedInUser) {
+    if (project.creator !== loggedInUser?._id)
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
 
     const tasks = await Task.find({
       project: id,
@@ -54,29 +53,27 @@ export async function PUT(
 
     await dbConnect();
 
-    const { ok, message, resStatus, loggedInUser, accountType } =
-      await checkAuth();
+    const { ok, message, resStatus, loggedInUser } = await checkAuth();
     if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    if (accountType !== "Workspace")
+    if (loggedInUser?.accountType !== "Workspace")
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const body = await req.json();
+    const body: Partial<IProject> = await req.json();
 
     const updated = await Project.findOneAndUpdate(
-      { _id: id, creator: loggedInUser },
+      { _id: id, creator: loggedInUser._id },
       body,
       {
         new: true,
       }
     );
 
-    if (!updated) {
+    if (!updated)
       return NextResponse.json(
         { message: "Project not found" },
         { status: 404 }
       );
-    }
 
     return NextResponse.json(
       { updated, message: "Project updated" },
@@ -99,26 +96,24 @@ export async function DELETE(
 
     await dbConnect();
 
-    const { ok, message, resStatus, loggedInUser, accountType } =
-      await checkAuth();
+    const { ok, message, resStatus, loggedInUser } = await checkAuth();
     if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    if (accountType !== "Workspace")
+    if (loggedInUser?.accountType !== "Workspace")
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     await Task.deleteMany({ projectID: id });
 
     const deleted = await Project.findOneAndDelete({
       _id: id,
-      creator: loggedInUser,
+      creator: loggedInUser._id,
     });
 
-    if (!deleted) {
+    if (!deleted)
       return NextResponse.json(
         { message: "Project not found" },
         { status: 404 }
       );
-    }
 
     return NextResponse.json(
       { deleted, message: "Project deleted" },

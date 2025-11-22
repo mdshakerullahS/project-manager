@@ -1,4 +1,13 @@
-import { Schema, models, model, Model, InferSchemaType } from "mongoose";
+import { Schema, models, model, Model, Types } from "mongoose";
+
+export interface IProject extends Document {
+  title: string;
+  description: string;
+  status: "To Do" | "In Progress" | "Completed";
+  deadline: Date;
+  creator: Types.ObjectId;
+  assignedTo: Types.ObjectId;
+}
 
 const projectSchema = new Schema(
   {
@@ -19,8 +28,6 @@ const projectSchema = new Schema(
   },
   { timestamps: true }
 );
-
-export type IProject = InferSchemaType<typeof projectSchema>;
 
 const Project: Model<IProject> =
   models.Project || model<IProject>("Project", projectSchema);

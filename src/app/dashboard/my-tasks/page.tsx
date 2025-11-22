@@ -1,5 +1,28 @@
-import Tasks from "@/src/components/tasks";
+"use client";
 
-export default function page() {
+import Tasks from "@/src/components/tasks";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function Page() {
+  const { data: session, status } = useSession();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session?.user.accountType !== "Individual") {
+      router.push("/dashboard");
+    }
+  }, []);
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-500 text-lg animate-pulse">Loading...</p>
+      </div>
+    );
+  }
+
   return <Tasks />;
 }

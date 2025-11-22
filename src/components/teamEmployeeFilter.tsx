@@ -1,13 +1,11 @@
-import React, { SetStateAction } from "react";
+import { FilterProps } from "./projectTaskFilters";
 import { Button } from "./ui/button";
 
-type FilterProps = {
-  filterValue: string;
-  setFilterValue: React.Dispatch<SetStateAction<string>>;
-};
-
-export default function Filters({ filterValue, setFilterValue }: FilterProps) {
-  const filters = ["All", "To Do", "In Progress", "Completed"];
+export default function TeamEmployeeFilter({
+  filterValue,
+  setFilterValue,
+}: FilterProps) {
+  const filters = ["All", "Available", "Busy"];
 
   return (
     <div className="flex items-center py-2">

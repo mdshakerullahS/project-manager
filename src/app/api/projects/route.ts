@@ -1,8 +1,9 @@
-import Project from "@/src/app/models/Project";
+import Project, { IProject } from "@/src/app/models/Project";
 import dbConnect from "@/src/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import Task from "@/src/app/models/Task";
 import { checkAuth } from "@/src/lib/checkAuth";
+import Team from "../../models/Team";
 
 export async function GET() {
   try {
@@ -11,12 +12,26 @@ export async function GET() {
     const { ok, message, resStatus, loggedInUser } = await checkAuth();
     if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    const projects = await Project.find({ creator: loggedInUser });
+    if (!loggedInUser?.accountType)
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    if (!projects)
+    let projects: IProject[] = [];
+    if (loggedInUser.accountType === "Workspace") {
+      projects = await Project.find({ creator: loggedInUser._id });
+    }
+    if (loggedInUser.accountType === "Individual") {
+      const teams = await Team.find({ operator: loggedInUser._id }).select(
+        "_id"
+      );
+      const teamIds = teams.map((t) => t._id);
+
+      projects = await Project.find({ assignedTo: { $in: teamIds } });
+    }
+
+    if (!projects.length)
       return NextResponse.json(
         { message: "Projects not found" },
-        { status: 404 }
+        { status: 200 }
       );
 
     return NextResponse.json({ projects }, { status: 200 });
@@ -24,7 +39,7 @@ export async function GET() {
     console.log(error.message);
 
     return NextResponse.json(
-      { message: "Error getting project" },
+      { message: "Error getting projects" },
       { status: 400 }
     );
   }
@@ -34,28 +49,26 @@ export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
-    const { ok, message, resStatus, loggedInUser, accountType } =
-      await checkAuth();
+    const { ok, message, resStatus, loggedInUser } = await checkAuth();
     if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    if (accountType !== "Workspace")
+    if (loggedInUser?.accountType !== "Workspace")
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const { title, description, tasks, status, deadline, assignedTo } =
       await req.json();
-    if (!title) {
+    if (!title)
       return NextResponse.json(
         { message: "Please enter project title" },
         { status: 400 }
       );
-    }
 
     const project = await Project.create({
       title,
       description,
       status,
       deadline,
-      creator: loggedInUser,
+      creator: loggedInUser._id,
       assignedTo,
     });
 

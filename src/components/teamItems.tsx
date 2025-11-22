@@ -29,25 +29,25 @@ type TeamType = {
 };
 
 export default function TeamItems() {
-  const [teams, setTeams] = useState<TeamType[] | []>([]);
+  const [teams, setTeams] = useState<TeamType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<string | null>(null);
 
+  const getTeams = async () => {
+    try {
+      const res = await fetch("/api/teams");
+
+      if (!res.ok) throw new Error("Error fetching teams");
+
+      const data = await res.json();
+
+      setTeams(data.teams || []);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
-    const getTeams = async () => {
-      try {
-        const res = await fetch("/api/teams");
-
-        if (!res.ok) throw new Error("Error fetching teams");
-
-        const data = await res.json();
-
-        setTeams(data.teams || []);
-      } catch (error: any) {
-        console.log(error.message);
-      }
-    };
-
     getTeams();
   }, []);
 
@@ -55,9 +55,9 @@ export default function TeamItems() {
     try {
       setLoading(true);
 
-      const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/teams/${id}`, { method: "DELETE" });
 
-      if (!res.ok) throw new Error("Failed to delete project");
+      if (!res.ok) throw new Error("Failed to delete team");
 
       const data: any = await res.json();
 
@@ -75,9 +75,9 @@ export default function TeamItems() {
 
   return (
     <>
-      {(!teams || !teams.length) && (
+      {!teams.length && (
         <p className="text-center py-42">
-          No projects yet - Click "Create Project" to create one.
+          No teams yet- Click "Create Team" to create one.{" "}
         </p>
       )}
 
@@ -134,7 +134,7 @@ export default function TeamItems() {
                 </DialogDescription>
               </DialogHeader>
 
-              {/* <TeamForm id={team._id} /> */}
+              <TeamForm id={team._id} />
             </DialogContent>
           </Dialog>
         </Item>

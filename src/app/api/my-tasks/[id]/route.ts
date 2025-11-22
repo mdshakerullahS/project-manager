@@ -1,4 +1,5 @@
-import Task from "@/src/app/models/Task";
+import Task, { ITask } from "@/src/app/models/Task";
+import { checkAuth } from "@/src/lib/checkAuth";
 import dbConnect from "@/src/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,17 +10,26 @@ export async function PUT(
   try {
     const { id } = await context.params;
 
-    const body = await req.json();
-
     await dbConnect();
 
-    const updated = await Task.findByIdAndUpdate(id, body, {
-      new: true,
-    });
+    const { ok, message, resStatus, loggedInUser } = await checkAuth();
+    if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    if (!updated) {
+    const body: Partial<ITask> = await req.json();
+
+    const updated = await Task.findOneAndUpdate(
+      {
+        _id: id,
+        creator: loggedInUser?._id,
+      },
+      body,
+      {
+        new: true,
+      }
+    );
+
+    if (!updated)
       return NextResponse.json({ message: "Task not found" }, { status: 404 });
-    }
 
     return NextResponse.json(
       { updated, message: "Task updated" },
@@ -42,11 +52,15 @@ export async function DELETE(
 
     await dbConnect();
 
-    const deleted = await Task.findByIdAndDelete(id);
+    const { ok, message, resStatus, loggedInUser } = await checkAuth();
+    if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    if (!deleted) {
+    const deleted = await Task.findOneAndDelete({
+      _id: id,
+      creator: loggedInUser?._id,
+    });
+    if (!deleted)
       return NextResponse.json({ message: "Task not found" }, { status: 404 });
-    }
 
     return NextResponse.json(
       { deleted, message: "Task deleted" },

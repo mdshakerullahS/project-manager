@@ -14,6 +14,7 @@ export default function Page() {
 
   const handleSubmit = async (selected: "Individual" | "Workspace") => {
     setType(selected);
+    console.log(selected);
 
     await fetch(`/api/users/${session?.user.id}`, {
       method: "PUT",

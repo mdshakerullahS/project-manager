@@ -10,24 +10,29 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { UserType } from "../stores/employeeStore";
 // import { toast } from "sonner";
 
-export default function EmployeeItems() {
-  const [employees, setEmployees] = useState<UserType[] | []>([]);
+type ProposalType = {
+  _id: string;
+  workspace: string;
+  employeeEmail: string;
+};
+
+export default function ProposalItems() {
+  const [proposals, setProposals] = useState<ProposalType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const getEmployees = async () => {
+  const getRequests = async () => {
     try {
       setLoading(true);
 
-      const res = await fetch("/api/employees");
+      const res = await fetch("/api/proposals");
 
-      if (!res.ok) throw new Error("Error fetching employees");
+      if (!res.ok) throw new Error("Error fetching proposals");
 
       const data = await res.json();
 
-      setEmployees(data.employees || []);
+      setProposals(data.proposals || []);
     } catch (error: any) {
       console.log(error.message);
     } finally {
@@ -36,19 +41,16 @@ export default function EmployeeItems() {
   };
 
   useEffect(() => {
-    getEmployees();
+    getRequests();
   }, []);
 
   if (loading) {
     return <p className="text-center pt-24">Loading...</p>;
   }
-
   return (
     <>
-      {!employees.length && (
-        <p className="text-center py-42">
-          No employee yet - Click "Add Employee" to make request.
-        </p>
+      {!proposals.length && (
+        <p className="text-center py-42">No proposals yet.</p>
       )}
 
       <Table>
@@ -62,10 +64,10 @@ export default function EmployeeItems() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {employees.map((employee) => (
+          {proposals.map((prop) => (
             <TableRow>
-              <TableCell className="font-medium">{employee.name}</TableCell>
-              <TableCell>{employee.name}</TableCell>
+              <TableCell className="font-medium">{prop.workspace}</TableCell>
+              <TableCell>{prop.employeeEmail}</TableCell>
               <TableCell>2</TableCell>
               <TableCell className="text-right">fff</TableCell>
             </TableRow>

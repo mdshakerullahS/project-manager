@@ -1,9 +1,23 @@
-import { Schema, models, model, Model, InferSchemaType } from "mongoose";
+import { Schema, models, model, Model, Types } from "mongoose";
+
+export interface ITask extends Document {
+  creator: Types.ObjectId;
+  title: string;
+  status: "To Do" | "In Progress" | "Completed";
+  project?: Types.ObjectId;
+  assignedTo: Types.ObjectId;
+}
 
 const taskSchema = new Schema(
   {
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     title: {
       type: String,
+      required: true,
     },
     status: {
       type: String,
@@ -16,8 +30,6 @@ const taskSchema = new Schema(
   },
   { timestamps: true }
 );
-
-export type ITask = InferSchemaType<typeof taskSchema>;
 
 const Task: Model<ITask> = models.Task || model<ITask>("Task", taskSchema);
 

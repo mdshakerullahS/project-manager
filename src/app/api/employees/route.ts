@@ -3,19 +3,22 @@ import dbConnect from "@/src/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import Workspace from "../../models/Workspace";
 import User from "../../models/User";
+import Request from "../../models/Proposal";
+// import Task from "../../models/Task";
 
 export async function GET() {
   try {
     await dbConnect();
 
-    const { ok, message, resStatus, loggedInUser, accountType } =
-      await checkAuth();
+    const { ok, message, resStatus, loggedInUser } = await checkAuth();
     if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    if (accountType !== "Workspace")
+    if (loggedInUser?.accountType !== "Workspace")
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const workspace = await Workspace.findOne({ account: loggedInUser }).lean();
+    const workspace = await Workspace.findOne({
+      account: loggedInUser?._id,
+    }).lean();
 
     if (!workspace) {
       return NextResponse.json(
@@ -27,6 +30,23 @@ export async function GET() {
     const employees = await User.find({
       _id: { $in: workspace.employees },
     }).lean();
+
+    if (!employees.length)
+      return NextResponse.json(
+        { message: "No employees found" },
+        { status: 200 }
+      );
+
+    // const fullEmployees = [];
+    // for (const employee of employees) {
+    //   const currentProjectCount = await Task.countDocuments({
+    //     assignedTo: employee._id,
+    //   });
+
+    //   const fullEmployee = { ...employee, currentProjectCount };
+
+    //   fullEmployees.push(fullEmployee);
+    // }
 
     return NextResponse.json({ employees }, { status: 200 });
   } catch (error: any) {
@@ -42,38 +62,40 @@ export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
-    const { ok, message, resStatus, loggedInUser, accountType } =
-      await checkAuth();
+    const { ok, message, resStatus, loggedInUser } = await checkAuth();
     if (!ok) return NextResponse.json({ message }, { status: resStatus });
 
-    if (accountType !== "Individual")
+    if (loggedInUser?.accountType !== "Individual")
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const { isAccepted, workspaceID } = await req.json();
 
-    if (!isAccepted) {
-      return NextResponse.json(
-        { message: "Request declined." },
-        { status: 200 }
-      );
-    }
-
     const workspace = await Workspace.findById(workspaceID);
-
     if (!workspace)
       return NextResponse.json(
         { message: "Workspace not found" },
         { status: 404 }
       );
 
-    workspace.employees.push(Object(loggedInUser));
+    await Request.findOneAndDelete({
+      workspace: workspace._id,
+      employeeEmail: loggedInUser.email,
+    });
 
-    await workspace.save();
+    if (isAccepted) {
+      workspace.employees.push(loggedInUser._id);
+      await workspace.save();
 
-    return NextResponse.json(
-      { message: "Request accepted. Added to workspace." },
-      { status: 200 }
-    );
+      return NextResponse.json(
+        { message: "Request accepted. Added to workspace." },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json(
+        { message: "Request declined." },
+        { status: 200 }
+      );
+    }
   } catch (error: any) {
     console.log(error.message);
     return NextResponse.json(

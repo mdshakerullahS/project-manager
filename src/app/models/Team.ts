@@ -1,4 +1,11 @@
-import { Schema, model, models, Model, InferSchemaType } from "mongoose";
+import { Schema, model, models, Model, Types } from "mongoose";
+
+export interface ITeam extends Document {
+  name: string;
+  creator: Types.ObjectId;
+  operator: Types.ObjectId;
+  members: Types.ObjectId[];
+}
 
 const teamSchema = new Schema(
   {
@@ -9,8 +16,6 @@ const teamSchema = new Schema(
   },
   { timestamps: true }
 );
-
-export type ITeam = InferSchemaType<typeof teamSchema>;
 
 const Team: Model<ITeam> = models.Team || model<ITeam>("Team", teamSchema);
 

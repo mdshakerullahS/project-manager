@@ -1,6 +1,7 @@
 "use client";
 
-import { ProjectType, useProjects } from "@/src/app/context/ProjectContext";
+import { ProjectType } from "@/src/components/projects";
+import { TaskType } from "@/src/components/taskItems";
 import { Button } from "@/src/components/ui/button";
 import {
   Card,
@@ -23,32 +24,35 @@ import {
   ItemTitle,
 } from "@/src/components/ui/item";
 import { MoreHorizontalIcon, PenBox, Trash } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type PageProps = {
   params: Promise<{
-    slug: string;
+    id: string;
   }>;
 };
 
 export default function Page({ params }: PageProps) {
+  const { id } = use(params);
   const [loading, setLoading] = useState<boolean>(false);
   const [project, setProject] = useState<ProjectType | null>(null);
-  const { projects } = useProjects();
 
-  const { slug } = use(params);
-
-  const thisProject = projects.find(
-    (project) => project.title.toLowerCase().replaceAll(" ", "-") === slug
-  );
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
-    if (!thisProject?._id) return;
+    if (session?.user.accountType !== "Workspace") {
+      router.push("/dashboard");
+    }
+  }, []);
 
+  useEffect(() => {
     const getProject = async () => {
       try {
-        const res = await fetch(`/api/projects/${thisProject._id}`, {
+        const res = await fetch(`/api/projects/${id}`, {
           method: "GET",
           credentials: "include",
         });
@@ -62,7 +66,7 @@ export default function Page({ params }: PageProps) {
     };
 
     getProject();
-  }, [thisProject]);
+  }, [id]);
 
   const handleDelete = async (id: string) => {
     try {
@@ -82,7 +86,7 @@ export default function Page({ params }: PageProps) {
     }
   };
 
-  if (loading) {
+  if (loading || status === "loading") {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-gray-500 text-lg animate-pulse">Loading...</p>
@@ -109,7 +113,7 @@ export default function Page({ params }: PageProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {project?.tasks.map((task) => (
+        {project?.tasks.map((task: TaskType) => (
           <Item key={task._id} variant="outline" className="cursor-pointer">
             <ItemContent>
               <ItemTitle>{task.title}</ItemTitle>

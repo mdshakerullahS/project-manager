@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { MoreHorizontalIcon, PenBox, Trash } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -11,10 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Item, ItemActions, ItemContent, ItemTitle } from "./ui/item";
-import { useProjects } from "../app/context/ProjectContext";
 import { toast } from "sonner";
 import Link from "next/link";
-import { ProjectType } from "../app/context/ProjectContext";
 import {
   Dialog,
   DialogContent,
@@ -23,13 +21,22 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import ProjectForm from "./projectForm";
+import { ProjectType } from "./projects";
+import { useSession } from "next-auth/react";
 
 type ItemProps = {
   filteredProjects: ProjectType[];
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  loading: boolean;
 };
 
-export default function ProjectItems({ filteredProjects }: ItemProps) {
-  const { getProjects, loading, setLoading } = useProjects();
+export default function ProjectItems({
+  filteredProjects,
+  setLoading,
+  loading,
+}: ItemProps) {
+  const { data: session } = useSession();
+
   const [openDialog, setOpenDialog] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
@@ -43,7 +50,6 @@ export default function ProjectItems({ filteredProjects }: ItemProps) {
       const data: any = await res.json();
 
       toast.success(data.message);
-      await getProjects();
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -66,11 +72,7 @@ export default function ProjectItems({ filteredProjects }: ItemProps) {
       {filteredProjects.map((project) => (
         <Item key={project._id} variant="outline">
           <ItemContent>
-            <Link
-              href={`/dashboard/projects/${project.title
-                .toLowerCase()
-                .replaceAll(" ", "-")}`}
-            >
+            <Link href={`/dashboard/projects/${project._id}`}>
               <ItemTitle>{project.title}</ItemTitle>
             </Link>
           </ItemContent>

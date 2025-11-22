@@ -1,18 +1,20 @@
-import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import dbConnect from "@/src/lib/db";
-import User from "@/src/app/models/User";
+import User, { IUser } from "@/src/app/models/User";
+
+interface IUserSession {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  accountType?: string | null;
+}
 
 declare module "next-auth" {
   interface Session {
-    user: {
-      id: string;
-      accountType: "Individual" | "Workspace" | null;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    } & DefaultSession["user"];
+    user: IUserSession;
   }
 }
 
@@ -37,7 +39,7 @@ export const authOptions: NextAuthOptions = {
         const existingUser = await User.findOne({ email: user.email });
 
         if (!existingUser) {
-          const created = await User.create({
+          await User.create({
             accountType: null,
             name: user.name,
             email: user.email,
@@ -62,11 +64,13 @@ export const authOptions: NextAuthOptions = {
           const dbUser = await User.findOne({ email: session.user.email });
 
           if (dbUser) {
-            session.user.accountType = dbUser.accountType;
-            session.user.id = dbUser._id.toString();
-            session.user.name = dbUser.name;
-            session.user.email = dbUser.email;
-            session.user.image = dbUser.image;
+            session.user = {
+              id: dbUser._id.toString(),
+              name: dbUser.name,
+              email: dbUser.email,
+              image: dbUser.image,
+              accountType: dbUser.accountType,
+            };
           }
         }
         return session;

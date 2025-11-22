@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { MoreHorizontalIcon, PenBox, Trash } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -21,14 +21,24 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import TaskForm from "./taskForm";
-import { TaskType, useTasks } from "../app/context/TaskContext";
 
+export type TaskType = {
+  _id: string;
+  projectID: string;
+  title: string;
+  status: "To Do" | "In Progress" | "Completed";
+};
 type ItemProps = {
   filteredTasks: TaskType[];
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  loading: boolean;
 };
 
-export default function TaskItems({ filteredTasks }: ItemProps) {
-  const { getTasks, loading, setLoading } = useTasks();
+export default function TaskItems({
+  filteredTasks,
+  setLoading,
+  loading,
+}: ItemProps) {
   const [openDialog, setOpenDialog] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
@@ -42,7 +52,6 @@ export default function TaskItems({ filteredTasks }: ItemProps) {
       const data: any = await res.json();
 
       toast.success(data.message);
-      await getTasks();
     } catch (error: any) {
       toast.error(error.message);
     } finally {

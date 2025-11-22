@@ -1,12 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import Filters from "./filters";
-import { useTasks } from "../app/context/TaskContext";
-import TaskItems from "./taskItems";
+import { useEffect, useState } from "react";
+import TaskItems, { TaskType } from "./taskItems";
+import ProjectTaskFilter from "./projectTaskFilters";
 
 export default function Tasks() {
-  const { tasks } = useTasks();
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const getTasks = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/my-tasks");
+
+      if (!res.ok) {
+        throw new Error("Tasks couldn't be fetched");
+      }
+      const data = await res.json();
+
+      setTasks(data.tasks || []);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getTasks();
+  }, []);
 
   const [filterValue, setFilterValue] = useState<string>("All");
 
@@ -17,8 +38,15 @@ export default function Tasks() {
 
   return (
     <div className="flex flex-col gap-2">
-      <Filters filterValue={filterValue} setFilterValue={setFilterValue} />
-      <TaskItems filteredTasks={filteredTasks} />
+      <ProjectTaskFilter
+        filterValue={filterValue}
+        setFilterValue={setFilterValue}
+      />
+      <TaskItems
+        filteredTasks={filteredTasks}
+        setLoading={setLoading}
+        loading={loading}
+      />
     </div>
   );
 }

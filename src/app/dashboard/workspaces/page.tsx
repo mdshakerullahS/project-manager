@@ -1,9 +1,9 @@
 "use client";
 
-import Teams from "@/src/components/teams";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Workspaces from "@/src/components/workspaces";
 
 export default function Page() {
   const { data: session, status } = useSession();
@@ -11,7 +11,7 @@ export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
-    if (session?.user.accountType !== "Workspace") {
+    if (session?.user.accountType !== "Individual") {
       router.push("/dashboard");
     }
   }, []);
@@ -24,5 +24,5 @@ export default function Page() {
     );
   }
 
-  return <Teams />;
+  return <Workspaces />;
 }
