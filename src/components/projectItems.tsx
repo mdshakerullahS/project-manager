@@ -65,7 +65,11 @@ export default function ProjectItems({
     <>
       {(!filteredProjects || !filteredProjects.length) && (
         <p className="text-center py-42">
-          No projects yet - Click "Create Project" to create one.
+          {`No projects yet${
+            session?.user.accountType === "Workspace"
+              ? ' - Click "Create Project" to create one'
+              : ""
+          }.`}
         </p>
       )}
 

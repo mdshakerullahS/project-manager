@@ -46,8 +46,6 @@ const workspaceItems: SidebarItemType[] = [
 ];
 
 const individualItems: SidebarItemType[] = [
-  { label: "Dashboard", icon: LayoutDashboard },
-  { label: "Projects", icon: FolderKanban },
   { label: "My Tasks", icon: CheckSquare },
   { label: "Workspaces", icon: Briefcase },
 ];

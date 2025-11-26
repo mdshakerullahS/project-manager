@@ -6,14 +6,14 @@ import WorkspaceFilter from "./workspaceFilter";
 import ProposalItems from "./proposalItems";
 
 export default function Workspaces() {
-  const [filterValue, setFilterValue] = useState<string>("Workspaces");
+  const [filterValue, setFilterValue] = useState<string>("Working");
   return (
     <div>
       <WorkspaceFilter
         filterValue={filterValue}
         setFilterValue={setFilterValue}
       />
-      {filterValue === "Workspaces" ? <WorkspaceItems /> : <ProposalItems />}
+      {filterValue === "Working" ? <WorkspaceItems /> : <ProposalItems />}
     </div>
   );
 }

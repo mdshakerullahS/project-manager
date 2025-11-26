@@ -3,16 +3,23 @@ import { create } from "zustand";
 export type UserType = {
   _id: string;
   name: string;
+  email: string;
+  image?: string;
+  accountType?: string | null;
 };
 
-type EmployeeStore = {
-  employees: UserType[];
+interface IEmployees extends UserType {
+  taskCount: number;
+}
+
+type EmployeeStoreType = {
+  employees: IEmployees[];
   loading: boolean;
   error: string | null;
   getEmployees: () => Promise<void>;
 };
 
-const useEmployees = create<EmployeeStore>((set) => ({
+const useEmployees = create<EmployeeStoreType>((set) => ({
   employees: [],
   loading: false,
   error: null,

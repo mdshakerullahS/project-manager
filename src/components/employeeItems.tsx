@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -10,30 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { UserType } from "../stores/employeeStore";
-// import { toast } from "sonner";
+import useEmployees from "../stores/employeeStore";
 
 export default function EmployeeItems() {
-  const [employees, setEmployees] = useState<UserType[] | []>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const getEmployees = async () => {
-    try {
-      setLoading(true);
-
-      const res = await fetch("/api/employees");
-
-      if (!res.ok) throw new Error("Error fetching employees");
-
-      const data = await res.json();
-
-      setEmployees(data.employees || []);
-    } catch (error: any) {
-      console.log(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { loading, employees, getEmployees } = useEmployees();
 
   useEffect(() => {
     getEmployees();
@@ -47,7 +27,7 @@ export default function EmployeeItems() {
     <>
       {!employees.length && (
         <p className="text-center py-42">
-          No employee yet - Click "Add Employee" to make request.
+          No employee yet - Click "Add Employee" to send proposal.
         </p>
       )}
 
@@ -55,19 +35,19 @@ export default function EmployeeItems() {
         <TableCaption>A list of your recent invoices.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Workspace</TableHead>
+            <TableHead>Workspace</TableHead>
             <TableHead>My Role</TableHead>
             <TableHead>Tasks in Progress</TableHead>
-            <TableHead className="text-right">Join Date</TableHead>
+            <TableHead>Join Date</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {employees.map((employee) => (
             <TableRow>
-              <TableCell className="font-medium">{employee.name}</TableCell>
               <TableCell>{employee.name}</TableCell>
-              <TableCell>2</TableCell>
-              <TableCell className="text-right">fff</TableCell>
+              <TableCell>Frontend Developer</TableCell>
+              <TableCell>{employee.taskCount}</TableCell>
+              <TableCell>null</TableCell>
             </TableRow>
           ))}
         </TableBody>

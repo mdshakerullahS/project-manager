@@ -9,13 +9,11 @@ interface IFormInput {
 }
 
 export default function EmployeeForm() {
-  const { register, watch, handleSubmit, control, reset } = useForm<IFormInput>(
-    {
-      defaultValues: {
-        email: "",
-      },
-    }
-  );
+  const { register, watch, handleSubmit, reset } = useForm<IFormInput>({
+    defaultValues: {
+      email: "",
+    },
+  });
 
   const email = watch("email");
 
@@ -30,7 +28,7 @@ export default function EmployeeForm() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to request employee");
+        throw new Error("Failed to send proposal");
       }
 
       const result = await res.json();

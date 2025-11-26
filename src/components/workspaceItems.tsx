@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -11,12 +10,15 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { UserType } from "../stores/employeeStore";
 
 type WorkspaceType = {
   _id: string;
-  account: string;
+  account: UserType;
   employees: string[];
+  taskCount: number;
 };
+
 export default function WorkspaceItems() {
   const [Workspaces, setWorkspaces] = useState<WorkspaceType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,32 +50,26 @@ export default function WorkspaceItems() {
   }
 
   return (
-    <>
-      {!Workspaces.length && (
-        <p className="text-center py-42">No Workspaces yet.</p>
-      )}
-
-      <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
-        <TableHeader>
+    <Table>
+      <TableCaption>{!Workspaces.length && "No workspace yet."}</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Workspace</TableHead>
+          <TableHead>My Role</TableHead>
+          <TableHead>Tasks in Progress</TableHead>
+          <TableHead>Join Date</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {Workspaces.map((ws) => (
           <TableRow>
-            <TableHead className="w-[100px]">Workspace</TableHead>
-            <TableHead>My Role</TableHead>
-            <TableHead>Tasks in Progress</TableHead>
-            <TableHead className="text-right">Join Date</TableHead>
+            <TableCell>{ws.account.name}</TableCell>
+            <TableCell>Frontend Developer</TableCell>
+            <TableCell>{ws.taskCount}</TableCell>
+            <TableCell>null</TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Workspaces.map((ws) => (
-            <TableRow>
-              <TableCell className="font-medium">{ws.account}</TableCell>
-              <TableCell>{ws.employees}</TableCell>
-              <TableCell>2</TableCell>
-              <TableCell className="text-right">fff</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

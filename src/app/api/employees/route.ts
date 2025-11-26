@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Workspace from "../../models/Workspace";
 import User from "../../models/User";
 import Request from "../../models/Proposal";
-// import Task from "../../models/Task";
+import Task from "../../models/Task";
 
 export async function GET() {
   try {
@@ -29,7 +29,7 @@ export async function GET() {
 
     const employees = await User.find({
       _id: { $in: workspace.employees },
-    }).lean();
+    });
 
     if (!employees.length)
       return NextResponse.json(
@@ -37,18 +37,16 @@ export async function GET() {
         { status: 200 }
       );
 
-    // const fullEmployees = [];
-    // for (const employee of employees) {
-    //   const currentProjectCount = await Task.countDocuments({
-    //     assignedTo: employee._id,
-    //   });
+    const fullEmployees = [];
+    for (const emp of employees) {
+      const count = await Task.countDocuments({
+        assignedTo: emp._id,
+      });
 
-    //   const fullEmployee = { ...employee, currentProjectCount };
+      fullEmployees.push({ ...emp.toObject(), taskCount: count });
+    }
 
-    //   fullEmployees.push(fullEmployee);
-    // }
-
-    return NextResponse.json({ employees }, { status: 200 });
+    return NextResponse.json({ fullEmployees }, { status: 200 });
   } catch (error: any) {
     console.log(error.message);
     return NextResponse.json(

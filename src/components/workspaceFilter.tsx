@@ -7,7 +7,7 @@ export default function WorkspaceFilter({
 }: FilterProps) {
   return (
     <div className="flex items-center py-2">
-      {["Workspaces", "Proposals"].map((filter) => (
+      {["Working", "Proposals"].map((filter) => (
         <Button
           key={filter}
           variant={`${filterValue === filter ? "outline" : "ghost"}`}

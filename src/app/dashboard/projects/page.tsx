@@ -2,9 +2,15 @@
 
 import Projects from "@/src/components/projects";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  if (session?.user.accountType === "Individual") {
+    router.push("/dashboard");
+  }
 
   if (status === "loading") {
     return (

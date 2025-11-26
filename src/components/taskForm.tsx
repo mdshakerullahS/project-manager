@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { TaskType } from "./taskItems";
 import { toast } from "sonner";
 import { Types } from "mongoose";
-import { useSession } from "next-auth/react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -23,20 +22,19 @@ interface IFormInput {
 }
 
 export default function TaskForm({ id }: TaskFormProps) {
-  const { data: session } = useSession();
   const [task, setTask] = useState<TaskType | null>(null);
 
   useEffect(() => {
     if (id) {
       const getTask = async () => {
         try {
-          const res = await fetch(`/api/tasks/${id}`, {
+          const res = await fetch(`/api/my-tasks/${id}`, {
             method: "GET",
             credentials: "include",
           });
           const result = await res.json();
 
-          setTask(result.fullProject);
+          setTask(result.task);
         } catch (error) {
           console.error(error);
           toast.error("Failed to load task");
@@ -47,22 +45,17 @@ export default function TaskForm({ id }: TaskFormProps) {
     }
   }, []);
 
-  const { register, watch, handleSubmit, control, reset } = useForm<IFormInput>(
-    {
-      defaultValues: {
-        creator: session?.user.id,
-        title: "",
-        status: "To Do",
-        assignedTo: session?.user.id,
-      },
-    }
-  );
+  const { register, watch, handleSubmit, reset } = useForm<IFormInput>({
+    defaultValues: {
+      title: task ? task.title : "",
+      status: task ? task.status : "To Do",
+    },
+  });
 
   useEffect(() => {
     if (task) {
       reset({
         title: task.title,
-        assignedTo: "",
         status: task.status || "To Do",
       });
     }
@@ -73,7 +66,7 @@ export default function TaskForm({ id }: TaskFormProps) {
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     try {
       const method = task ? "PUT" : "POST";
-      const url = task ? `/api/tasks/${task._id}` : `/api/tasks`;
+      const url = task ? `/api/my-tasks/${task._id}` : `/api/my-tasks`;
 
       const res = await fetch(url, {
         method,

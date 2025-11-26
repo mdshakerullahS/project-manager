@@ -2,22 +2,25 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Home() {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
 
+  const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/sign-in");
-    }
+    if (pathname === "/") {
+      if (status === "unauthenticated") router.push("/sign-in");
 
-    if (status === "authenticated") {
-      router.push("/dashboard");
+      if (status === "authenticated") {
+        if (session.user.accountType === "Workspace") router.push("/dashboard");
+        if (session.user.accountType === "Individual")
+          router.push("/dashboard/my-tasks");
+      }
     }
-  }, [status, router]);
+  }, [status, pathname, router]);
 
   if (status === "loading") {
     return (
@@ -27,5 +30,5 @@ export default function Home() {
     );
   }
 
-  return <></>;
+  return null;
 }

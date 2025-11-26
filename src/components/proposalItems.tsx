@@ -10,12 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-// import { toast } from "sonner";
+import { UserType } from "../stores/employeeStore";
 
 type ProposalType = {
   _id: string;
-  workspace: string;
+  workspace: UserType;
   employeeEmail: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export default function ProposalItems() {
@@ -26,7 +28,7 @@ export default function ProposalItems() {
     try {
       setLoading(true);
 
-      const res = await fetch("/api/proposals");
+      const res = await fetch("/api/employees/proposals");
 
       if (!res.ok) throw new Error("Error fetching proposals");
 
@@ -48,32 +50,24 @@ export default function ProposalItems() {
     return <p className="text-center pt-24">Loading...</p>;
   }
   return (
-    <>
-      {!proposals.length && (
-        <p className="text-center py-42">No proposals yet.</p>
-      )}
-
-      <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
-        <TableHeader>
+    <Table>
+      <TableCaption>{!proposals.length && "No proposals yet."}</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Workspace</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead>Date</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {proposals.map((prop) => (
           <TableRow>
-            <TableHead className="w-[100px]">Workspace</TableHead>
-            <TableHead>My Role</TableHead>
-            <TableHead>Tasks in Progress</TableHead>
-            <TableHead className="text-right">Join Date</TableHead>
+            <TableCell>{prop.workspace.name}</TableCell>
+            <TableCell>Frontend Developer</TableCell>
+            <TableCell>{prop.createdAt}</TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {proposals.map((prop) => (
-            <TableRow>
-              <TableCell className="font-medium">{prop.workspace}</TableCell>
-              <TableCell>{prop.employeeEmail}</TableCell>
-              <TableCell>2</TableCell>
-              <TableCell className="text-right">fff</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

@@ -15,7 +15,7 @@ import {
 } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { ProjectType } from "./projects";
-import useEmployees from "../stores/employeeStore";
+import useTeams from "../stores/teamStore";
 
 type ProjectFormProps = {
   id?: string;
@@ -31,10 +31,10 @@ interface IFormInput {
 }
 
 export default function ProjectForm({ id }: ProjectFormProps) {
-  const { employees, getEmployees } = useEmployees();
+  const { teams, getTeams } = useTeams();
 
   useEffect(() => {
-    getEmployees();
+    getTeams();
   }, []);
 
   const [project, setProject] = useState<ProjectType | null>(null);
@@ -176,10 +176,8 @@ export default function ProjectForm({ id }: ProjectFormProps) {
             control={control}
             render={({ field: { onChange, value } }) => (
               <Select
-                options={employees}
-                value={
-                  employees.find((employee) => employee.name === value) || null
-                }
+                options={teams}
+                value={teams.find((team) => team.name === value) || null}
                 onChange={(selectedOption) =>
                   onChange(selectedOption ? selectedOption.name : "")
                 }

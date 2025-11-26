@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     const task = await Task.create({
+      creator: loggedInUser._id,
       title,
       status,
       assignedTo: loggedInUser._id,

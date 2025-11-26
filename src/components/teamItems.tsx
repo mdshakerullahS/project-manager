@@ -19,33 +19,11 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import TeamForm from "./teamForm";
-
-type TeamType = {
-  _id: string;
-  name: string;
-  creator: string;
-  operator: string;
-  members: string[];
-};
+import useTeams from "../stores/teamStore";
 
 export default function TeamItems() {
-  const [teams, setTeams] = useState<TeamType[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, teams, getTeams } = useTeams();
   const [openDialog, setOpenDialog] = useState<string | null>(null);
-
-  const getTeams = async () => {
-    try {
-      const res = await fetch("/api/teams");
-
-      if (!res.ok) throw new Error("Error fetching teams");
-
-      const data = await res.json();
-
-      setTeams(data.teams || []);
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  };
 
   useEffect(() => {
     getTeams();
@@ -53,8 +31,6 @@ export default function TeamItems() {
 
   const handleDelete = async (id: string) => {
     try {
-      setLoading(true);
-
       const res = await fetch(`/api/teams/${id}`, { method: "DELETE" });
 
       if (!res.ok) throw new Error("Failed to delete team");
@@ -64,8 +40,6 @@ export default function TeamItems() {
       toast.success(data.message);
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
