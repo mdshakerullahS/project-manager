@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.log(error.message);
+    console.log(error);
     return NextResponse.json(
       { message: "Failed to send proposal" },
       { status: 400 }

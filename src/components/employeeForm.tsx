@@ -19,7 +19,7 @@ export default function EmployeeForm() {
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     try {
-      const res = await fetch("/api/employee/proposals", {
+      const res = await fetch("/api/employees/proposals", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
