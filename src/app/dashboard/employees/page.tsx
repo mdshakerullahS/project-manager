@@ -14,7 +14,7 @@ export default function Page() {
     if (session?.user.accountType !== "Workplace") {
       router.push("/dashboard");
     }
-  }, []);
+  }, [session]);
 
   if (status === "loading") {
     return (
