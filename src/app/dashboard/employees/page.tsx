@@ -11,10 +11,10 @@ export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
-    if (session?.user.accountType !== "Workplace") {
+    if (session?.user.accountType !== "Workspace") {
       router.push("/dashboard");
     }
-  }, [session]);
+  }, [session, status]);
 
   if (status === "loading") {
     return (

@@ -18,7 +18,7 @@ export async function GET() {
 
     const workspace = await Workspace.findOne({
       account: loggedInUser?._id,
-    }).lean();
+    });
 
     if (!workspace) {
       return NextResponse.json(
@@ -48,7 +48,7 @@ export async function GET() {
 
     return NextResponse.json({ fullEmployees }, { status: 200 });
   } catch (error: any) {
-    console.log(error.message);
+    console.log(error);
     return NextResponse.json(
       { message: "Error getting employees" },
       { status: 400 }

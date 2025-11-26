@@ -25,18 +25,15 @@ export default function EmployeeItems() {
 
   return (
     <>
-      {!employees.length && (
-        <p className="text-center py-42">
-          No employee yet - Click "Add Employee" to send proposal.
-        </p>
-      )}
-
       <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableCaption>
+          {!employees.length &&
+            'No employee yet - Click "Add Employee" to send proposal.'}
+        </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Workspace</TableHead>
-            <TableHead>My Role</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Role</TableHead>
             <TableHead>Tasks in Progress</TableHead>
             <TableHead>Join Date</TableHead>
           </TableRow>

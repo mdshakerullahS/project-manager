@@ -33,7 +33,7 @@ const useEmployees = create<EmployeeStoreType>((set) => ({
 
       const data = await res.json();
 
-      set({ employees: data.employees, loading: false });
+      set({ employees: data.fullEmployees, loading: false });
     } catch (error: any) {
       set({ error: error.message, loading: false });
     }

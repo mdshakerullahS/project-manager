@@ -44,7 +44,7 @@ export default function Page() {
   return (
     <div className="grid grid-cols-3">
       {data.map((d) => (
-        <Item variant="outline">
+        <Item key={d.title} variant="outline">
           <ItemContent>
             <ItemTitle>{d.count}</ItemTitle>
             <ItemDescription>{d.title} </ItemDescription>
