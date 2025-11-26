@@ -33,7 +33,7 @@ export async function GET() {
 
     if (!employees.length)
       return NextResponse.json(
-        { message: "No employees found" },
+        { message: "No employees found", fullEmployees: [] },
         { status: 200 }
       );
 
