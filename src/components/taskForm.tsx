@@ -28,10 +28,7 @@ export default function TaskForm({ id }: TaskFormProps) {
     if (id) {
       const getTask = async () => {
         try {
-          const res = await fetch(`/api/my-tasks/${id}`, {
-            method: "GET",
-            credentials: "include",
-          });
+          const res = await fetch(`/api/my-tasks/${id}`);
           const result = await res.json();
 
           setTask(result.task);

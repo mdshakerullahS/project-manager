@@ -11,6 +11,9 @@ import {
   TableRow,
 } from "./ui/table";
 import { UserType } from "../stores/employeeStore";
+import { Button } from "./ui/button";
+import { CheckCircle, X } from "lucide-react";
+import { toast } from "sonner";
 
 type ProposalType = {
   _id: string;
@@ -24,7 +27,7 @@ export default function ProposalItems() {
   const [proposals, setProposals] = useState<ProposalType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const getRequests = async () => {
+  const getProposals = async () => {
     try {
       setLoading(true);
 
@@ -41,10 +44,26 @@ export default function ProposalItems() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
-    getRequests();
+    getProposals();
   }, []);
+
+  const handleActions = async (
+    id: string,
+    { accept, decline }: { accept?: boolean; decline?: boolean }
+  ) => {
+    try {
+      const res = await fetch(`/api/employees/proposals/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          body: JSON.stringify({ accept, decline }),
+        },
+      });
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  };
 
   if (loading) {
     return <p className="text-center pt-24">Loading...</p>;
@@ -57,6 +76,7 @@ export default function ProposalItems() {
           <TableHead>Workspace</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Date</TableHead>
+          <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -65,6 +85,21 @@ export default function ProposalItems() {
             <TableCell>{prop.workspace.name}</TableCell>
             <TableCell>Frontend Developer</TableCell>
             <TableCell>{prop.createdAt}</TableCell>
+            <TableCell className="space-x-2">
+              <Button
+                size="icon-sm"
+                variant="destructive"
+                onClick={() => handleActions(prop._id, { decline: true })}
+              >
+                <X />
+              </Button>
+              <Button
+                size="icon-sm"
+                onClick={() => handleActions(prop._id, { accept: true })}
+              >
+                <CheckCircle />
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
