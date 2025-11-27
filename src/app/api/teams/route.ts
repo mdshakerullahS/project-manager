@@ -12,7 +12,7 @@ export async function GET() {
 
     let teams: ITeam[] | [] = [];
     if (loggedInUser?.accountType === "Workspace") {
-      teams = await Team.find({ creator: loggedInUser });
+      teams = await Team.find({ creator: loggedInUser._id });
     }
     if (loggedInUser?.accountType === "Individual") {
       teams = await Team.find({ members: loggedInUser._id });

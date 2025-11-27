@@ -51,7 +51,7 @@ export default function ProjectForm({ id }: ProjectFormProps) {
           setProject(result.fullProject);
         } catch (error) {
           console.error(error);
-          toast.error("Failed to load task");
+          toast.error("Failed to load project");
         }
       };
 
@@ -176,11 +176,14 @@ export default function ProjectForm({ id }: ProjectFormProps) {
             control={control}
             render={({ field: { onChange, value } }) => (
               <Select
-                options={teams}
-                value={teams.find((team) => team.name === value) || null}
-                onChange={(selectedOption) =>
-                  onChange(selectedOption ? selectedOption.name : "")
-                }
+                options={teams.map((e) => ({
+                  value: e._id,
+                  label: e.name,
+                }))}
+                value={teams
+                  .map((e) => ({ value: e._id, label: e.name }))
+                  .filter((opt) => value.includes(opt.value))}
+                onChange={(selected) => onChange(selected?.value || "")}
                 placeholder="Select Team..."
                 isClearable
               />
