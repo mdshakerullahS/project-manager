@@ -45,7 +45,9 @@ export async function PUT(
     }
 
     if (accept) {
-      const workspace = await Workspace.findById(proposal.workspace);
+      const workspace = await Workspace.findOne({
+        account: proposal.workspace,
+      });
       if (!workspace)
         return NextResponse.json(
           { message: "Workspace not found" },
