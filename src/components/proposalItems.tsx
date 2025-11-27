@@ -51,7 +51,7 @@ export default function ProposalItems() {
 
   const handleActions = async (
     id: string,
-    { accept, decline }: { accept?: boolean; decline?: boolean }
+    { accept, decline }: { accept: boolean; decline: boolean }
   ) => {
     try {
       const res = await fetch(`/api/employees/proposals/${id}`, {
@@ -96,13 +96,17 @@ export default function ProposalItems() {
               <Button
                 size="icon-sm"
                 variant="destructive"
-                onClick={() => handleActions(prop._id, { decline: true })}
+                onClick={() =>
+                  handleActions(prop._id, { decline: true, accept: false })
+                }
               >
                 <X />
               </Button>
               <Button
                 size="icon-sm"
-                onClick={() => handleActions(prop._id, { accept: true })}
+                onClick={() =>
+                  handleActions(prop._id, { accept: true, decline: false })
+                }
               >
                 <CheckCircle />
               </Button>
