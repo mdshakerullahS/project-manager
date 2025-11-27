@@ -14,6 +14,7 @@ import { UserType } from "../stores/employeeStore";
 import { Button } from "./ui/button";
 import { CheckCircle, X } from "lucide-react";
 import { toast } from "sonner";
+import { error } from "console";
 
 type ProposalType = {
   _id: string;
@@ -60,8 +61,14 @@ export default function ProposalItems() {
           body: JSON.stringify({ accept, decline }),
         },
       });
-    } catch (error) {
-      toast.error("Something went wrong");
+
+      if (!res.ok) throw new Error("Error making the action");
+
+      const data = await res.json();
+
+      toast.success(data.message);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 

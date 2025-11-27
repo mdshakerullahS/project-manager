@@ -1,4 +1,5 @@
 import Proposal from "@/src/app/models/Proposal";
+import Workspace from "@/src/app/models/Workspace";
 import { checkAuth } from "@/src/lib/checkAuth";
 import dbConnect from "@/src/lib/db";
 import { NextRequest, NextResponse } from "next/server";
@@ -28,17 +29,32 @@ export async function PUT(
 
     const { accept, decline } = await req.json();
 
-    if (decline)
+    if (decline) {
+      await proposal.deleteOne();
+
       return NextResponse.json(
         { message: "Proposal declined" },
         { status: 200 }
       );
+    }
 
-    if (accept)
+    if (accept) {
+      const workspace = await Workspace.findById(proposal.workspace);
+      if (!workspace)
+        return NextResponse.json(
+          { message: "Workspace not found" },
+          { status: 404 }
+        );
+
+      workspace?.employees.push(loggedInUser._id);
+
+      await workspace.save();
+
       return NextResponse.json(
         { message: "Proposal accepted" },
         { status: 200 }
       );
+    }
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(
