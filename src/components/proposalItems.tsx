@@ -62,7 +62,10 @@ export default function ProposalItems() {
         body: JSON.stringify({ accept, decline }),
       });
 
-      if (!res.ok) throw new Error("Error making the action");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Action failed");
+      }
 
       const data = await res.json();
 
