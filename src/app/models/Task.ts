@@ -1,4 +1,4 @@
-import { Schema, models, model, Model, Types } from "mongoose";
+import { Schema, models, model, Model, Types, Document } from "mongoose";
 
 export interface ITask extends Document {
   creator: Types.ObjectId;

@@ -1,4 +1,4 @@
-import { Schema, model, models, Model, Types } from "mongoose";
+import { Schema, model, models, Model, Types, Document } from "mongoose";
 
 export interface ITeam extends Document {
   name: string;

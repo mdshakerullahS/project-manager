@@ -79,13 +79,16 @@ export default function TeamForm({ id }: TeamFormProps) {
           control={control}
           render={({ field: { onChange, value } }) => (
             <Select
-              options={employees}
+              options={employees.map((e) => ({
+                value: e._id,
+                label: e.name,
+              }))}
               value={
-                employees.find((employee) => employee.name === value) || null
+                employees
+                  .map((e) => ({ value: e._id, label: e.name }))
+                  .find((option) => option.value === value) || null
               }
-              onChange={(selectedOption) =>
-                onChange(selectedOption ? selectedOption.name : "")
-              }
+              onChange={(selected) => onChange(selected?.value || "")}
               placeholder="Select Operator..."
               isClearable
             />
@@ -101,13 +104,14 @@ export default function TeamForm({ id }: TeamFormProps) {
           render={({ field: { onChange, value } }) => (
             <Select
               isMulti
-              options={employees}
-              value={employees.filter((employee) =>
-                (value || []).includes(employee.name)
-              )}
-              onChange={(members) => {
-                onChange(members ? members.map((option) => option.name) : []);
-              }}
+              options={employees.map((e) => ({
+                value: e._id,
+                label: e.name,
+              }))}
+              value={employees
+                .map((e) => ({ value: e._id, label: e.name }))
+                .filter((opt) => value.includes(opt.value))}
+              onChange={(selected) => onChange(selected.map((s) => s.value))}
               placeholder="Select Members..."
             />
           )}
