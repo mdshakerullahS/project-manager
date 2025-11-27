@@ -29,7 +29,7 @@ export async function PUT(
 
     const { accept, decline } = await req.json();
 
-    if (accept && decline)
+    if (!accept && !decline)
       return NextResponse.json(
         { message: "Something went wrong" },
         { status: 400 }
