@@ -58,8 +58,8 @@ export default function ProposalItems() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          body: JSON.stringify({ accept, decline }),
         },
+        body: JSON.stringify({ accept, decline }),
       });
 
       if (!res.ok) throw new Error("Error making the action");
